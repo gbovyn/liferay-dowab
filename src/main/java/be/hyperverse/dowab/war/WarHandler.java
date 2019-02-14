@@ -70,10 +70,9 @@ public class WarHandler {
 				.findFirst();
 
 		try {
-			System.out.println("bloop: " + Paths.get(DEPLOY, file.getName()));
+			log.info("Deploying " + Paths.get(DEPLOY, file.getName()));
 			if (bundle.isPresent()) {
 				log.info("Updating bundle...");
-				//cleanCache(bundle.get());
 				updateBundle(bundle.get(), file);
 			} else {
 				log.info("Bundle not yet present, doing a classic deploy...");
@@ -90,7 +89,7 @@ public class WarHandler {
 			}
 		}
 	}
-	
+
 	private void cleanCache(final Bundle bundle) {
 		// TODO: remove css cache only if css/js changed
 		final Enumeration<URL> js = bundle.findEntries("/js/", "*.js", true);
@@ -117,7 +116,7 @@ public class WarHandler {
 			log.info("No files found in aggregate folder");
 		}
 	}
-	
+
 	private void updateBundle(final Bundle bundle, final File file) throws IOException, BundleException {
 		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 		ZipOutputStream zip = new ZipOutputStream(bytes);

@@ -26,7 +26,7 @@ import be.hyperverse.dowab.war.WarHandler;
 public class AutoDeployScanner extends Thread {
 	private static final Log log = LogFactoryUtil.getLog(AutoDeployScanner.class);
 
-	private static final String TMPDIR = "java.io.tmpdir";
+	private static final String TMP_DIR = "java.io.tmpdir";
 	private static final String WAB_EXTENSION = ".wab";
 	private static final String WAR_EXTENSION = ".war";
 
@@ -144,7 +144,7 @@ public class AutoDeployScanner extends Thread {
 			return;
 		}
 
-		Path tempFile = Paths.get(System.getProperty(TMPDIR), fileName);
+		Path tempFile = Paths.get(System.getProperty(TMP_DIR), fileName);
 		try {
 			Files.move(Paths.get(file.getAbsolutePath()), tempFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
 			blacklistFileTimestamps.put(file.getName(), file.lastModified());
@@ -154,7 +154,14 @@ public class AutoDeployScanner extends Thread {
 		}
 
 		LocalDateTime end = LocalDateTime.now();
-		log.info("Duration in seconds: " + Duration.between(start, end).getSeconds() + " seconds");
-		log.info("Duration in minutes: " + Duration.between(start, end).toMinutes() + " minutes");
+		log.info("Deploy took " + getFormattedDuration(Duration.between(start, end)));
+	}
+
+	private String getFormattedDuration(Duration duration) {
+		final long minutes = duration.toMinutes();
+		final long seconds = duration.getSeconds() % 60;
+		final long millis = duration.toMillis();
+
+		return String.format("%s milliseconds (%s minutes %s seconds)", millis, minutes, seconds);
 	}
 }

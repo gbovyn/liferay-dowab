@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 import be.hyperverse.dowab.BundleUtils;
-import be.hyperverse.dowab.war.WarHandler;
 
 public class WabHandler {
 	private static final Log log = LogFactoryUtil.getLog(WabHandler.class);
