@@ -21,7 +21,7 @@ import be.hyperverse.dowab.BundleUtils;
 import be.hyperverse.dowab.war.WarHandler;
 
 public class WabHandler {
-	private static final Log log = LogFactoryUtil.getLog(WarHandler.class);
+	private static final Log log = LogFactoryUtil.getLog(WabHandler.class);
 
 	private final BundleContext bc;
 
