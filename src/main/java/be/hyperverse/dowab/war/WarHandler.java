@@ -34,15 +34,15 @@ public class WarHandler {
 	private static final String LIFERAY_HOME = PropsUtil.get(PropsKeys.LIFERAY_HOME);
 	private static final String DEPLOY = PropsUtil.get(PropsKeys.AUTO_DEPLOY_DEPLOY_DIR);
 
-	private static final String TLDS_PATH = LIFERAY_HOME + "/tomcat-8.0.32/webapps/ROOT/WEB-INF/tld/";
+	private static final String TLDS_PATH = LIFERAY_HOME + "/tomcat-9.0.6/webapps/ROOT/WEB-INF/tld/";
 	private static final List<String> TLDS = Arrays.asList(
 			"liferay-ui.tld", "liferay-aui.tld", "liferay-portlet-ext.tld",
 			"liferay-util.tld", "liferay-security.tld", "liferay-portlet.tld", "liferay-theme.tld");
 
-	private static final String LIBS_PATH = LIFERAY_HOME + "/tomcat-8.0.32/webapps/ROOT/WEB-INF/lib/";
+	private static final String LIBS_PATH = LIFERAY_HOME + "/tomcat-9.0.6/webapps/ROOT/WEB-INF/lib/";
 	private static final List<String> LIBS = Arrays.asList("util-bridges.jar", "util-java.jar");
 
-	private static final String CACHE_PATH = LIFERAY_HOME + "/tomcat-8.0.32/work/Catalina/localhost/ROOT/aggregate";
+	private static final String CACHE_PATH = LIFERAY_HOME + "/tomcat-9.0.6/work/Catalina/localhost/ROOT/aggregate";
 
 	private static final String LIFERAY_PROPERTIES_PATH = "/WEB-INF/liferay-plugin-package.properties";
 	private static final String MANIFEST_PATH = "/META-INF/MANIFEST.MF";
@@ -73,7 +73,7 @@ public class WarHandler {
 			System.out.println("bloop: " + Paths.get(DEPLOY, file.getName()));
 			if (bundle.isPresent()) {
 				log.info("Updating bundle...");
-				cleanCache(bundle.get());
+				//cleanCache(bundle.get());
 				updateBundle(bundle.get(), file);
 			} else {
 				log.info("Bundle not yet present, doing a classic deploy...");
@@ -103,7 +103,7 @@ public class WarHandler {
 			System.out.println(x.getPath());
 		});
 
-		cleanCache(bundle.getSymbolicName());
+		//cleanCache(bundle.getSymbolicName());
 	}
 
 	private void cleanCache(final String symbolicName) {

@@ -124,7 +124,7 @@ public class AutoDeployScanner extends Thread {
 		for (File file : files) {
 			String fileName = file.getName();
 
-			fileName = StringUtil.toLowerCase(fileName);
+			//fileName = StringUtil.toLowerCase(fileName);
 
 			if (file.isFile() && fileName.endsWith(WAB_EXTENSION)) {
 				log.info("Processing WAB file: " + file.getName());
