@@ -16,7 +16,7 @@ public class BundleUtils {
 
 		int x = path.lastIndexOf(File.separator);
 		final String extension = FileUtil.getExtension(path);
-		int y = path.lastIndexOf(extension);
+		int y = path.lastIndexOf("." + extension);
 
 		String name = path.substring(x + 1, y);
 

@@ -37,10 +37,10 @@ public class WabHandler {
 			Optional<Bundle> bundle = Arrays.stream(bc.getBundles()).filter(b -> b.getSymbolicName().equals(symbolicName)).findFirst();
 			try (FileInputStream fileStream = new FileInputStream(file)) {
 				if (bundle.isPresent()) {
-					log.info("Updating: " + bundle);
+					log.info("Updating: " + bundle.get() + " - " + file);
 					bundle.get().update(fileStream);
 				} else {
-					log.info("Installing: " + bundle);
+					log.info("Installing: " + symbolicName + " - " + file);
 					Bundle b = bc.installBundle(artifactPath.toString(), new FileInputStream(file));
 					BundleStartLevel bundleStartLevel = b.adapt(BundleStartLevel.class);
 					bundleStartLevel.setStartLevel(1);
