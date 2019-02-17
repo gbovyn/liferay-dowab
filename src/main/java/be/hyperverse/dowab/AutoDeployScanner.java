@@ -24,11 +24,12 @@ import be.hyperverse.dowab.wab.WabHandler;
 import be.hyperverse.dowab.war.WarHandler;
 
 public class AutoDeployScanner extends Thread {
-	private static final Log log = LogFactoryUtil.getLog(AutoDeployScanner.class);
+	private static final Log LOG = LogFactoryUtil.getLog(AutoDeployScanner.class);
 
 	private static final String TMP_DIR = "java.io.tmpdir";
 	private static final String WAB_EXTENSION = ".wab";
 	private static final String WAR_EXTENSION = ".war";
+	private static final String WAB_WAR_EXTENSION = ".wab.war";
 
 	private boolean started = true;
 	private final File deployDir;
@@ -65,15 +66,15 @@ public class AutoDeployScanner extends Thread {
 			try {
 				sleep(2);
 			} catch (InterruptedException ie) {
-				log.debug(ie.getMessage());
+				LOG.debug(ie.getMessage());
 			}
 
 			try {
 				checkDeployDir();
 				scanDirectory();
 			} catch (Exception e) {
-				if (log.isWarnEnabled()) {
-					log.warn("Unable to scan the auto deploy directory", e);
+				if (LOG.isWarnEnabled()) {
+					LOG.warn("Unable to scan the auto deploy directory", e);
 				}
 			}
 		}
@@ -81,14 +82,14 @@ public class AutoDeployScanner extends Thread {
 	
 	private void checkDeployDir() {
 		if (!deployDir.exists()) {
-			if (log.isInfoEnabled()) {
-				log.info("Creating missing directory " + deployDir);
+			if (LOG.isInfoEnabled()) {
+				LOG.info("Creating missing directory " + deployDir);
 			}
 
 			boolean created = deployDir.mkdirs();
 
 			if (!created) {
-				log.error("Directory " + deployDir + " could not be created");
+				LOG.error("Directory " + deployDir + " could not be created");
 			}
 		}
 	}
@@ -126,12 +127,14 @@ public class AutoDeployScanner extends Thread {
 
 			//fileName = StringUtil.toLowerCase(fileName);
 
-			if (file.isFile() && fileName.endsWith(WAB_EXTENSION)) {
-				log.info("Processing WAB file: " + file.getName());
-				handleFile(fileName, file, wabHandler::processFile);
-			} else if (file.isFile() && fileName.endsWith(WAR_EXTENSION)) {
-				log.info("Processing WAR file " + file.getName());
-				handleFile(fileName, file, warHandler::processFile);
+			if (file.isFile()) {
+				if (fileName.endsWith(WAB_EXTENSION) || fileName.endsWith(WAB_WAR_EXTENSION)) {
+					LOG.info("Processing WAB file: " + file.getName());
+					handleFile(fileName, file, wabHandler::processFile);
+				} else if (fileName.endsWith(WAR_EXTENSION)) {
+					LOG.info("Processing WAR file " + file.getName());
+					handleFile(fileName, file, warHandler::processFile);
+				}
 			}
 		}
 	}
@@ -146,15 +149,16 @@ public class AutoDeployScanner extends Thread {
 
 		Path tempFile = Paths.get(System.getProperty(TMP_DIR), fileName);
 		try {
-			Files.move(Paths.get(file.getAbsolutePath()), tempFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+			Files.move(Paths.get(file.getAbsolutePath()), tempFile,
+					StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
 			blacklistFileTimestamps.put(file.getName(), file.lastModified());
 			function.accept(tempFile.toFile());
 		} catch (IOException e) {
-			log.error(e);
+			LOG.error(e);
 		}
 
 		LocalDateTime end = LocalDateTime.now();
-		log.info("Deploy took " + getFormattedDuration(Duration.between(start, end)));
+		LOG.info("Deploy took " + getFormattedDuration(Duration.between(start, end)));
 	}
 
 	private String getFormattedDuration(Duration duration) {

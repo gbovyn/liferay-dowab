@@ -15,7 +15,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 public class ZipUtils {
-	private static final Log log = LogFactoryUtil.getLog(ZipUtils.class);
+	private static final Log LOG = LogFactoryUtil.getLog(ZipUtils.class);
 
 	private static final byte[] BUFFER = new byte[4096 * 1024];
 
@@ -28,9 +28,10 @@ public class ZipUtils {
 		}
 	}
 
-	public static void copyZip(final File from, final ZipOutputStream append, final Set<String> excludes) throws IOException {
+	public static void copyZip(final File from, final ZipOutputStream append, final Set<String> excludes)
+			throws IOException {
 		try(ZipFile war = new ZipFile(from)) {
-			Enumeration<? extends ZipEntry> entries = war.entries();
+			final Enumeration<? extends ZipEntry> entries = war.entries();
 			while (entries.hasMoreElements()) {
 				ZipEntry zipEntry = entries.nextElement();
 				if (!excludes.contains(zipEntry.getName())) {
@@ -41,7 +42,7 @@ public class ZipUtils {
 						}
 						append.closeEntry();
 					} catch (ZipException ze) {
-						log.debug(ze.getMessage());
+						LOG.debug(ze.getMessage());
 					}
 				}
 			}

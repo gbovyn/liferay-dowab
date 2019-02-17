@@ -29,7 +29,7 @@ import be.hyperverse.dowab.BundleUtils;
 import be.hyperverse.dowab.ZipUtils;
 
 public class WarHandler {
-	private static final Log log = LogFactoryUtil.getLog(WarHandler.class);
+	private static final Log LOG = LogFactoryUtil.getLog(WarHandler.class);
 
 	private static final String LIFERAY_HOME = PropsUtil.get(PropsKeys.LIFERAY_HOME);
 	private static final String DEPLOY = PropsUtil.get(PropsKeys.AUTO_DEPLOY_DEPLOY_DIR);
@@ -70,21 +70,21 @@ public class WarHandler {
 				.findFirst();
 
 		try {
-			log.info("Deploying " + Paths.get(DEPLOY, file.getName()));
+			LOG.info("Deploying " + Paths.get(DEPLOY, file.getName()));
 			if (bundle.isPresent()) {
-				log.info("Updating bundle...");
+				LOG.info("Updating bundle...");
 				updateBundle(bundle.get(), file);
 			} else {
-				log.info("Bundle not yet present, doing a classic deploy...");
+				LOG.info("Bundle not yet present, doing a classic deploy...");
 				Files.move(Paths.get(file.getAbsolutePath()), Paths.get(DEPLOY, file.getName()),
 						StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
 			}
-			log.info("Processed: " + file.getName());
+			LOG.info("Processed: " + file.getName());
 		} catch (IOException | BundleException e) {
-			log.warn(e);
+			LOG.warn(e);
 		} finally {
 			if (bundle.isPresent()) {
-				log.info("Bundle is present, deleting file");
+				LOG.info("Bundle is present, deleting file");
 				file.delete();
 			}
 		}
@@ -110,16 +110,16 @@ public class WarHandler {
 		final File[] listFiles = cachePath.listFiles();
 		if (listFiles != null) {
 			Arrays.stream(listFiles).filter(x -> x.getName().toLowerCase().contains(symbolicName)).forEach(x -> {
-				log.info("May want to delete cache file: " + x.getAbsolutePath());
+				LOG.info("May want to delete cache file: " + x.getAbsolutePath());
 			});
 		} else {
-			log.info("No files found in aggregate folder");
+			LOG.info("No files found in aggregate folder");
 		}
 	}
 
 	private void updateBundle(final Bundle bundle, final File file) throws IOException, BundleException {
-		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-		ZipOutputStream zip = new ZipOutputStream(bytes);
+		final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+		final ZipOutputStream zip = new ZipOutputStream(bytes);
 
 		copyManifestFile(bundle, zip);
 		copyLiferayProperties(bundle, zip);
@@ -136,7 +136,7 @@ public class WarHandler {
 			try {
 				copyEntry(new FileInputStream(TLDS_PATH + t), "/WEB-INF/tld/" + t, zip);
 			} catch (FileNotFoundException e) {
-				log.warn(e);
+				LOG.warn(e);
 			}
 		});
 
@@ -144,7 +144,7 @@ public class WarHandler {
 			try {
 				copyEntry(new FileInputStream(LIBS_PATH + t), "/WEB-INF/lib/" + t, zip);
 			} catch (FileNotFoundException e) {
-				log.warn(e);
+				LOG.warn(e);
 			}
 		});
 
@@ -172,29 +172,29 @@ public class WarHandler {
 	}
 
 	private void copyEntry(final Bundle bundle, final String fileName, final ZipOutputStream append) {
-		URL entry = bundle.getEntry(fileName);
+		final URL entry = bundle.getEntry(fileName);
 		if (entry != null) {
 			try {
-				ZipEntry zipEntry = new ZipEntry(sanitizeFilename(fileName));
+				final ZipEntry zipEntry = new ZipEntry(sanitizeFilename(fileName));
 				append.putNextEntry(zipEntry);
 
 				ZipUtils.copy(entry.openStream(), append);
 				append.closeEntry();
 			} catch (IOException e) {
-				log.warn(e);
+				LOG.warn(e);
 			}
 		}
 	}
 
 	private void copyEntry(final InputStream from, final String fileName, final ZipOutputStream append) {
 		try {
-			ZipEntry entry = new ZipEntry(sanitizeFilename(fileName));
+			final ZipEntry entry = new ZipEntry(sanitizeFilename(fileName));
 			append.putNextEntry(entry);
 
 			ZipUtils.copy(from, append);
 			append.closeEntry();
 		} catch (IOException e) {
-			log.warn(e);
+			LOG.warn(e);
 		}
 	}
 

@@ -15,7 +15,6 @@ repositories {
 	}
 }
 
-
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'com.liferay.plugin'
@@ -37,11 +36,11 @@ dependencies {
 	compileOnly group: 'org.osgi', name: 'osgi.cmpn', version: '6.0.0'
 	compileOnly group: 'org.osgi', name: 'org.osgi.core', version: '6.0.0'
 
-	compileOnly('com.liferay.portal:com.liferay.portal.kernel:3.0.0')
+	compileOnly('com.liferay.portal:com.liferay.portal.kernel:2.49.0')
 }
 
 task 'deployToLiferay-local'(type: Copy) {
 	dependsOn build
 	from(file('build/libs/liferay-dowab.jar'))
-	into('E:/liferay71/bundles/deploy/')
+	into('C:\\Projects\\liferay\\bundles\\deploy\\')
 }

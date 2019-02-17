@@ -12,15 +12,15 @@ public class BundleUtils {
 	private BundleUtils() {}
 
 	public static String getSymbolicName(final File f) {
-		String path = f.getAbsolutePath();
+		final String path = f.getAbsolutePath();
 
-		int x = path.lastIndexOf(File.separator);
+		final int x = path.lastIndexOf(File.separator);
 		final String extension = FileUtil.getExtension(path);
-		int y = path.lastIndexOf("." + extension);
+		final int y = path.lastIndexOf("." + extension);
 
 		String name = path.substring(x + 1, y);
 
-		Matcher matcher = PATTERN.matcher(name);
+		final Matcher matcher = PATTERN.matcher(name);
 
 		if (matcher.matches()) {
 			name = matcher.group(1);

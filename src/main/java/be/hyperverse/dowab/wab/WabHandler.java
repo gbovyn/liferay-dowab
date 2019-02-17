@@ -2,6 +2,7 @@ package be.hyperverse.dowab.wab;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -20,7 +21,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import be.hyperverse.dowab.BundleUtils;
 
 public class WabHandler {
-	private static final Log log = LogFactoryUtil.getLog(WabHandler.class);
+	private static final Log LOG = LogFactoryUtil.getLog(WabHandler.class);
 
 	private final BundleContext bc;
 
@@ -30,38 +31,52 @@ public class WabHandler {
 
 	public void processFile(final File file) {
 		try {
-			String symbolicName = BundleUtils.getSymbolicName(file);
-			URL artifactPath = createBundleLocation(file.getAbsolutePath(), symbolicName);
+			final String symbolicName = BundleUtils.getSymbolicName(file);
 
-			Optional<Bundle> bundle = Arrays.stream(bc.getBundles()).filter(b -> b.getSymbolicName().equals(symbolicName)).findFirst();
-			try (FileInputStream fileStream = new FileInputStream(file)) {
+			final Optional<Bundle> bundle = Arrays.stream(bc.getBundles())
+					.filter(b -> b.getSymbolicName().equals(symbolicName))
+					.findFirst();
+
+			try (final FileInputStream fileStream = new FileInputStream(file)) {
 				if (bundle.isPresent()) {
-					log.info("Updating: " + bundle.get() + " - " + file);
-					bundle.get().update(fileStream);
+					updateBundle(file, bundle.get(), fileStream);
 				} else {
-					log.info("Installing: " + symbolicName + " - " + file);
-					Bundle b = bc.installBundle(artifactPath.toString(), new FileInputStream(file));
-					BundleStartLevel bundleStartLevel = b.adapt(BundleStartLevel.class);
-					bundleStartLevel.setStartLevel(1);
-					b.start();
+					installBundle(file, symbolicName);
 				}
-				log.info("Processed: " + file.getName());
+				LOG.info("Processed: " + file.getName());
 			} catch (IOException e) {
-				log.warn(e);
+				LOG.warn(e);
 			}
-		} catch (MalformedURLException | BundleException e) {
-			log.warn(e);
+		} catch (BundleException e) {
+			LOG.warn(e);
 		} finally {
 			file.delete();
 		}
 	}
 
+	private void updateBundle(final File file, final Bundle bundle, final FileInputStream fileStream)
+			throws BundleException {
+		LOG.info("Updating: " + bundle + " - " + file);
+		bundle.update(fileStream);
+	}
+
+	private void installBundle(final File file, final String symbolicName)
+			throws BundleException, FileNotFoundException, MalformedURLException {
+		final URL artifactPath = createBundleLocation(file.getAbsolutePath(), symbolicName);
+		LOG.info("Installing: " + symbolicName + " - " + file);
+		final Bundle b = bc.installBundle(artifactPath.toString(), new FileInputStream(file));
+		final BundleStartLevel bundleStartLevel = b.adapt(BundleStartLevel.class);
+		bundleStartLevel.setStartLevel(1);
+		b.start();
+	}
+
 	private URL createBundleLocation(final String path, final String symbolicName) throws MalformedURLException {
-		String contextName = symbolicName;
+		final String contextName = symbolicName;
 
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 
-		sb.append("file:" + path.replaceAll("\\\\", "/"));
+		sb.append("file:");
+		sb.append(path.replaceAll("\\\\", "/"));
 		sb.append("?");
 		sb.append(Constants.BUNDLE_SYMBOLICNAME);
 		sb.append("=");
